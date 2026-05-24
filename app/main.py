@@ -1,33 +1,48 @@
-import subprocess
-import signal
-import sys
-from app.rtc_modul import schedule_wakeup
+from datetime import datetime
 from dotenv import load_dotenv
+import logging
 import os
+
+from app.sensor_internal import VcgencmdSensor
+from app.communication import send_temperature
+
+LOG_FILE = "/home/klaus/PROD/alectryon.log"
+
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s  %(levelname)-8s  %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+log = logging.getLogger(__name__)
+
 
 def load_config():
     load_dotenv()  # lädt .env aus dem gleichen Verzeichnis
-    ftp_host     = os.getenv("FTP_HOST")
-    ftp_user     = os.getenv("FTP_USER")
-    ftp_password = os.getenv("FTP_PASSWORD")
-    ftp_port     = int(os.getenv("FTP_PORT", 21))  # 21 als Standardwert
 
-def cleanup_and_shutdown():
-    # z.B. Datei speichern, GPIO zurücksetzen...
-    print("Fahre herunter...")
-    subprocess.run(["sudo", "shutdown", "-h", "now"])
-
-# Auf Strg+C oder kill reagieren
-signal.signal(signal.SIGTERM, lambda s, f: cleanup_and_shutdown())
-signal.signal(signal.SIGINT, lambda s, f: cleanup_and_shutdown())
 
 def main():
-    # Dies wird nach dem Starten des Rapsberry regelmäßig ausgeführt
+    # Dies wird nach dem Starten des Raspberry regelmäßig alle 15 Minuten ausgeführt
     load_config()
-    print("Das Programm wurde gestartet!")
-    schedule_wakeup(15)
-    print("Alarm wurde gesetzt!")
-    print()
+    log.info("Programm gestartet")
+
+    try:
+        temp = VcgencmdSensor().read_temp_celsius()
+        log.info(f"Interne Temperatur: {temp:.1f} °C")
+    except Exception:
+        log.exception("Fehler beim Lesen der internen Temperatur")
+        return
+
+    stunde = datetime.now().hour
+    if 6 <= stunde < 23:
+        log.info("Innerhalb der Sendezeit – sende Temperatur...")
+        try:
+            send_temperature(temp)
+        except Exception:
+            log.exception("Fehler beim Senden der Temperatur")
+    else:
+        log.info("Außerhalb der Sendezeit (06–23 Uhr) – kein Versand.")
+
 
 if __name__ == "__main__":
     main()

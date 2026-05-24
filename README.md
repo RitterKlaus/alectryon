@@ -53,11 +53,33 @@ dtoverlay=i2c-rtc,ds3231
 
 sudo reboot
 
-# damit man den RTC Alarm setzen kann
-sudo usermod -a -G dialout klaus
 
-SQW auch auf SCL GPIO 3 (PIN 5) verbinden.
+1-wire Bus aktivieren für den Temperatursensor
 
 
+# Immer an, Stromverbrauch minimieren
+sudo nano /boot/firmware/config.txt
+dtoverlay=disable-bt
+Bluetooth Service abschalten
+sudo systemctl disable hciuart
+sudo systemctl disable bluetooth
 
+### HDMI-Anschluss deaktivieren (/boot/firmware/config.txt)
+dtoverlay=vc4-kms-v3d,nohdmi
+hdmi_blanking=2
+
+Raspberry WLAN Powersave eingeschaltet lassen
+Wir probieren das mal. Eventuell schalten wir das WLAN abends ab und morgens wieder an.
+Der Befehl braucht leider sudo
+
+
+
+## Zurückgestellte Funktionen
+
+Das Aufwecken per Alarm auf dem RTC-Modul ist aktuell nicht möglich.
+Der Ausgang SQW müsste mit SCL GPIO 3 (PIN 5) verbunden werden. Nur dieser Pin kann zum Aufwecken verwendet werden. Der Pin ist aber vom I2C-Bus belegt. Der Raspberry Pi Zero kann zwar andere Pins für I2C nutzen, das wäre dann aber kein Hardware-unterstützter Bus. Ausßerdem ist das Solar-Modul über Pogo-Pins verbunden und benötigt den I2C-Bus an dieser Stelle.
+
+Der Befehl rtcwake, den man im Internet findet, klappt außerdem nicht.
+
+Ich habe mich daher entschieden, eine große Akku-Kapazität zu verwenden und den Stromverbrauch zu minimieren.
 

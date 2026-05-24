@@ -1,0 +1,10 @@
+# /etc/systemd/system/measure.service
+[Unit]
+Description=Messwerte ermitteln und ggf. senden
+
+[Service]
+Type=oneshot
+User=klaus
+WorkingDirectory=/home/klaus/PROD/alectryon/
+ExecStart=/usr/bin/python3 /home/klaus/PROD/alectryon/app/main.py
+TimeoutStartSec=180

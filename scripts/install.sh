@@ -25,7 +25,6 @@ set -e  # Abbruch bei jedem Fehler
 
 INSTALL_DIR="/home/klaus/PROD"
 REPO_DIR="$INSTALL_DIR/alectryon"
-SERVICE_NAME="alectryon"
 
 echo "=== Installation startet: $(date) ==="
 
@@ -42,16 +41,16 @@ else
     git clone https://github.com/RitterKlaus/alectryon.git
 fi
 
-# 3. Service installieren
-echo "Installiere systemd-Service..."
-sudo cp "$REPO_DIR/scripts/$SERVICE_NAME.service" /etc/systemd/system/
+# 3. Service und Timer installieren
+echo "Installiere systemd-Service und Timer..."
+sudo cp "$REPO_DIR/scripts/measure.service" /etc/systemd/system/
+sudo cp "$REPO_DIR/scripts/measure.timer"   /etc/systemd/system/
 sudo systemctl daemon-reload   # ← wichtig nach jeder .service-Änderung
-sudo systemctl enable "$SERVICE_NAME"
-sudo systemctl start "$SERVICE_NAME"
+sudo systemctl enable --now measure.timer
 
 # 4. Nach dem git clone: Prüfen ob .env existiert
 if [ ! -f "$REPO_DIR/app/.env" ]; then
-    cp "$REPO_DIR/app/.env.example" "$REPO_DIR/app/.env" 
+    cp "$REPO_DIR/app/.env.example" "$REPO_DIR/app/.env"
     echo ""
     echo "    Bitte Werte in die .env Datei eintragen:"
     echo "    nano $REPO_DIR/app/.env"
@@ -60,7 +59,8 @@ fi
 
 # 5. Status prüfen
 echo "=== Installation abgeschlossen ==="
-sudo systemctl status "$SERVICE_NAME" --no-pager
+systemctl list-timers measure.timer --no-pager
+sudo systemctl status measure.service --no-pager
 
 # Ab jetzt hält sich das System selbst aktuell, in dem es neue Versionen von git lädt.
 

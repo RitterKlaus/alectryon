@@ -1,0 +1,12 @@
+# /etc/systemd/system/measure.timer
+[Unit]
+Description=Messung alle 15 Minuten
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=15min
+AccuracySec=10s
+Persistent=true
+
+[Install]
+WantedBy=timers.target
