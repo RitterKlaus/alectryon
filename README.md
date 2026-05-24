@@ -54,7 +54,21 @@ dtoverlay=i2c-rtc,ds3231
 sudo reboot
 
 
+Temperatursensoren an:
+GND Pin 20
+VCC Pin 17
+DATA Pin 11 (GPIO 17)
+
 1-wire Bus aktivieren für den Temperatursensor
+
+# Standard (GPIO 4) — ersetzen durch:
+dtoverlay=w1-gpio,gpiopin=17
+
+Prüfen:
+ls /sys/bus/w1/devices/
+Dort sollten wieder deine 28-xxxx-Einträge erscheinen
+
+
 
 
 # Immer an, Stromverbrauch minimieren

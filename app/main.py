@@ -6,7 +6,7 @@ import os
 from app.sensor_internal import VcgencmdSensor
 from app.communication import send_temperature
 
-LOG_FILE = "/home/klaus/PROD/alectryon.log"
+LOG_FILE = "alectryon.log"
 
 logging.basicConfig(
     filename=LOG_FILE,
