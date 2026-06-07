@@ -1,13 +1,33 @@
 import ftplib
 import os
+import shutil
 import subprocess
 from datetime import datetime
 
 CAMERA_DIR = "camera"
 
+# Absolute Fallback-Pfade für den eingeschränkten PATH im systemd-Service.
+# Bookworm nennt das Tool rpicam-still; Bullseye noch libcamera-still.
+_CAMERA_CANDIDATES = [
+    "rpicam-still",
+    "libcamera-still",
+    "/usr/bin/rpicam-still",
+    "/usr/bin/libcamera-still",
+]
+
 
 def _dev_mode() -> bool:
     return os.getenv("DEV_MODE", "false").lower() == "true"
+
+
+def _find_camera_binary() -> str:
+    for candidate in _CAMERA_CANDIDATES:
+        path = shutil.which(candidate) or (candidate if os.path.isfile(candidate) else None)
+        if path:
+            return path
+    raise FileNotFoundError(
+        f"Kein Kamera-Binary gefunden. Gesucht: {_CAMERA_CANDIDATES}"
+    )
 
 
 def take_photo() -> str:
@@ -19,8 +39,9 @@ def take_photo() -> str:
     if _dev_mode():
         return filename
 
+    binary = _find_camera_binary()
     result = subprocess.run(
-        ["libcamera-still", "--nopreview", "-t", "500", "-o", filename],
+        [binary, "--nopreview", "-t", "500", "-o", filename],
         capture_output=True,
         timeout=15,
     )
