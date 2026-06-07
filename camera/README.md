@@ -1,0 +1,1 @@
+Fotos der Camera werden in diesem Ordner gespeichert.

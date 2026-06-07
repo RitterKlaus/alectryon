@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import logging
 import os
 
+from app.camera import take_photo
 from app.sensor_internal import VcgencmdSensor
 from app.sensor_usv import UsvSensor
 from app.communication import send_data
@@ -51,6 +52,13 @@ def main():
             send_data(temp, usv)
         except Exception:
             log.exception("Fehler beim Senden der Daten")
+
+        if usv is not None and usv["ladestand_pz"] > 50:
+            try:
+                filename = take_photo()
+                log.info(f"Foto gespeichert: {filename}")
+            except Exception:
+                log.exception("Fehler beim Fotografieren")
     else:
         log.info("Außerhalb der Sendezeit (06–23 Uhr) – kein Versand.")
 
