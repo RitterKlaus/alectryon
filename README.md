@@ -68,14 +68,14 @@ Prüfen:
 ls /sys/bus/w1/devices/
 Dort sollten wieder deine 28-xxxx-Einträge erscheinen
 
-
+raspi-config
+Boot into Text Console einstellen!
 
 
 # Immer an, Stromverbrauch minimieren
 sudo nano /boot/firmware/config.txt
 dtoverlay=disable-bt
 Bluetooth Service abschalten
-sudo systemctl disable hciuart
 sudo systemctl disable bluetooth
 
 ### HDMI-Anschluss deaktivieren (/boot/firmware/config.txt)
