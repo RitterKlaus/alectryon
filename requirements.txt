@@ -3,4 +3,5 @@ charset-normalizer==3.4.7
 idna==3.16
 python-dotenv==1.2.2
 requests==2.34.2
+smbus2==0.6.1
 urllib3==2.7.0

@@ -4,7 +4,8 @@ import logging
 import os
 
 from app.sensor_internal import VcgencmdSensor
-from app.communication import send_temperature
+from app.sensor_usv import UsvSensor
+from app.communication import send_data
 
 LOG_FILE = "alectryon.log"
 
@@ -33,13 +34,23 @@ def main():
         log.exception("Fehler beim Lesen der internen Temperatur")
         return
 
+    try:
+        usv = UsvSensor().read()
+        log.info(f"USV – Spannung: {usv['spannung_v']} V | "
+                 f"Strom: {usv['strom_ma']} mA | "
+                 f"Leistung: {usv['leistung_w']} W | "
+                 f"Ladestand: {usv['ladestand_pz']} %")
+    except Exception:
+        log.exception("Fehler beim Lesen der USV-Daten")
+        usv = None
+
     stunde = datetime.now().hour
     if 6 <= stunde < 23:
-        log.info("Innerhalb der Sendezeit – sende Temperatur...")
+        log.info("Innerhalb der Sendezeit – sende Daten...")
         try:
-            send_temperature(temp)
+            send_data(temp, usv)
         except Exception:
-            log.exception("Fehler beim Senden der Temperatur")
+            log.exception("Fehler beim Senden der Daten")
     else:
         log.info("Außerhalb der Sendezeit (06–23 Uhr) – kein Versand.")
 
