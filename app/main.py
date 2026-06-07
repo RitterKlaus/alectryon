@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import logging
 import os
 
-from app.camera import take_photo
+from app.camera import take_photo, upload_photo
 from app.sensor_internal import VcgencmdSensor
 from app.sensor_usv import UsvSensor
 from app.communication import send_data
@@ -57,8 +57,10 @@ def main():
             try:
                 filename = take_photo()
                 log.info(f"Foto gespeichert: {filename}")
+                upload_photo(filename)
+                log.info(f"Foto hochgeladen: {os.path.basename(filename)}")
             except Exception:
-                log.exception("Fehler beim Fotografieren")
+                log.exception("Fehler bei Foto oder Upload")
     else:
         log.info("Außerhalb der Sendezeit (06–23 Uhr) – kein Versand.")
 

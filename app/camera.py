@@ -1,3 +1,4 @@
+import ftplib
 import os
 import subprocess
 from datetime import datetime
@@ -27,3 +28,21 @@ def take_photo() -> str:
         raise RuntimeError(result.stderr.decode())
 
     return filename
+
+
+def upload_photo(filename: str) -> None:
+    """Lädt ein Foto per FTPS auf den konfigurierten FTP-Server hoch."""
+    if _dev_mode():
+        return
+
+    host     = os.getenv("FTP_HOST")
+    user     = os.getenv("FTP_USER")
+    password = os.getenv("FTP_PASSWORD")
+    port     = int(os.getenv("FTP_PORT", "21"))
+
+    with ftplib.FTP_TLS() as ftp:
+        ftp.connect(host, port)
+        ftp.login(user, password)
+        ftp.prot_p()  # verschlüsselten Datenkanal aktivieren
+        with open(filename, "rb") as f:
+            ftp.storbinary(f"STOR {os.path.basename(filename)}", f)
