@@ -2,11 +2,11 @@ import os
 import requests
 
 
-def send_data(temp_celsius: float, usv: dict | None) -> None:
+def send_data(temp_cpu: float, usv: dict | None) -> None:
     api_url = os.getenv("API_URL")
     api_key = os.getenv("API_KEY")
 
-    payload = {"temp_celsius": round(temp_celsius, 2)}
+    payload = {"temp_cpu": round(temp_cpu, 2)}
     if usv:
         payload.update(usv)
 
