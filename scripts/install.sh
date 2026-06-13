@@ -16,6 +16,10 @@
 #sudo visudo
 # pi ALL=(ALL) NOPASSWD: /sbin/shutdown
 
+#sudo visudo
+# Diese Zeile hinzufügen:
+# klaus ALL=(ALL) NOPASSWD: /sbin/shutdown
+
 # Jetzt kann es losgehen
 
 # Bibliothek installieren:

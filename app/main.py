@@ -2,11 +2,12 @@ from datetime import datetime
 from dotenv import load_dotenv
 import logging
 import os
+import subprocess
 
 from app.camera import take_photo, upload_photo
 from app.sensor_internal import VcgencmdSensor
 from app.sensor_usv import UsvSensor
-from app.communication import send_data
+from app.communication import send_data, send_nachricht
 
 LOG_FILE = "alectryon.log"
 
@@ -63,6 +64,14 @@ def main():
                 log.exception("Fehler bei Foto oder Upload")
     else:
         log.info("Außerhalb der Sendezeit (06–23 Uhr) – kein Versand.")
+
+    if usv is not None and usv["ladestand_pz"] < 25:
+        log.warning(f"Ladestand kritisch ({usv['ladestand_pz']} %) – fahre herunter.")
+        try:
+            send_nachricht(f"Ladestand kritisch: {usv['ladestand_pz']} % – Raspberry fährt herunter.")
+        except Exception:
+            log.exception("Fehler beim Senden der Nachricht")
+        subprocess.run(["sudo", "shutdown", "-h", "now"])
 
 
 if __name__ == "__main__":

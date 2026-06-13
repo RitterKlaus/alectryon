@@ -1,4 +1,6 @@
 import os
+from urllib.parse import urlparse, urlunparse
+
 import requests
 
 
@@ -13,6 +15,21 @@ def send_data(temp_cpu: float, usv: dict | None) -> None:
     response = requests.post(
         api_url,
         json=payload,
+        headers={"Authorization": f"Bearer {api_key}"},
+        timeout=10,
+    )
+    response.raise_for_status()
+
+
+def send_nachricht(text: str) -> None:
+    api_url  = os.getenv("API_URL")
+    api_key  = os.getenv("API_KEY")
+    parsed   = urlparse(api_url)
+    url      = urlunparse(parsed._replace(path="/api/nachricht"))
+
+    response = requests.post(
+        url,
+        json={"text": text},
         headers={"Authorization": f"Bearer {api_key}"},
         timeout=10,
     )
