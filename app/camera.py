@@ -41,7 +41,7 @@ def take_photo() -> str:
 
     binary = _find_camera_binary()
     result = subprocess.run(
-        [binary, "--nopreview", "-t", "500", "-o", filename],
+        [binary, "--nopreview", "--rotation", "180", "-t", "500", "-o", filename],
         capture_output=True,
         timeout=15,
     )
