@@ -60,6 +60,7 @@ def main():
                 log.info(f"Foto gespeichert: {filename}")
                 upload_photo(filename)
                 log.info(f"Foto hochgeladen: {os.path.basename(filename)}")
+                send_nachricht("Neues Foto verfügbar!")
             except Exception:
                 log.exception("Fehler bei Foto oder Upload")
     else:
