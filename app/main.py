@@ -6,6 +6,7 @@ import subprocess
 
 from app.camera import take_photo, upload_photo
 from app.sensor_internal import VcgencmdSensor
+from app.sensor_temperatur import W1Sensoren
 from app.sensor_usv import UsvSensor
 from app.communication import send_data, send_nachricht
 
@@ -46,11 +47,19 @@ def main():
         log.exception("Fehler beim Lesen der USV-Daten")
         usv = None
 
+    try:
+        w1 = W1Sensoren().read()
+        log.info(f"1-Wire – Innen: {w1.get('temp_innen')} °C | "
+                 f"Außen: {w1.get('temp_aussen')} °C")
+    except Exception:
+        log.exception("Fehler beim Lesen der 1-Wire-Sensoren")
+        w1 = None
+
     stunde = datetime.now().hour
     if 6 <= stunde < 23:
         log.info("Innerhalb der Sendezeit – sende Daten...")
         try:
-            send_data(temp, usv)
+            send_data(temp, usv, w1)
         except Exception:
             log.exception("Fehler beim Senden der Daten")
 

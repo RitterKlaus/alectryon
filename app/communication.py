@@ -4,13 +4,15 @@ from urllib.parse import urlparse, urlunparse
 import requests
 
 
-def send_data(temp_cpu: float, usv: dict | None) -> None:
+def send_data(temp_cpu: float, usv: dict | None, w1: dict | None = None) -> None:
     api_url = os.getenv("API_URL")
     api_key = os.getenv("API_KEY")
 
     payload = {"temp_cpu": round(temp_cpu, 2)}
     if usv:
         payload.update(usv)
+    if w1:
+        payload.update(w1)
 
     response = requests.post(
         api_url,
