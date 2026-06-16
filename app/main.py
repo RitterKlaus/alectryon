@@ -63,7 +63,7 @@ def main():
         except Exception:
             log.exception("Fehler beim Senden der Daten")
 
-        if usv is not None and usv["ladestand_pz"] > 50:
+        if usv is not None and usv["ladestand_pz"] > 30:
             try:
                 filename = take_photo()
                 log.info(f"Foto gespeichert: {filename}")
@@ -75,7 +75,7 @@ def main():
     else:
         log.info("Außerhalb der Sendezeit (06–23 Uhr) – kein Versand.")
 
-    if usv is not None and usv["ladestand_pz"] < 25:
+    if usv is not None and usv["ladestand_pz"] < 20:
         log.warning(f"Ladestand kritisch ({usv['ladestand_pz']} %) – fahre herunter.")
         try:
             send_nachricht(f"Ladestand kritisch: {usv['ladestand_pz']} % – Raspberry fährt herunter.")
