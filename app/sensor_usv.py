@@ -85,8 +85,8 @@ class UsvSensor:
                 raw_pwr -= 65536
             leistung_w = raw_pwr * _POWER_LSB
 
-            # Ladestand: Formel aus Hersteller-Demo (3.0V = 0%, 4.2V = 100%)
-            ladestand_pz = round((spannung_v - 3.0) / 1.2 * 100)
+            # Ladestand: gemessene Grenzwerte (2.95V = 0%, 4.18V = 100%)
+            ladestand_pz = round((spannung_v - 2.95) / 1.23 * 100)
             ladestand_pz = max(0, min(100, ladestand_pz))
 
         return {
