@@ -6,6 +6,7 @@ import subprocess
 
 from app.camera import take_photo, upload_photo
 from app.sensor_internal import VcgencmdSensor
+from app.sensor_sunlight import SunlightSensor
 from app.sensor_temperatur import W1Sensoren
 from app.sensor_usv import UsvSensor
 from app.communication import send_data, send_nachricht
@@ -64,14 +65,17 @@ def main():
             log.exception("Fehler beim Senden der Daten")
 
         if usv is not None and usv["ladestand_pz"] > 30:
-            try:
-                filename = take_photo()
-                log.info(f"Foto gespeichert: {filename}")
-                upload_photo(filename)
-                log.info(f"Foto hochgeladen: {os.path.basename(filename)}")
-                send_nachricht("Neues Foto verfügbar!")
-            except Exception:
-                log.exception("Fehler bei Foto oder Upload")
+            if SunlightSensor().is_daytime():
+                try:
+                    filename = take_photo()
+                    log.info(f"Foto gespeichert: {filename}")
+                    upload_photo(filename)
+                    log.info(f"Foto hochgeladen: {os.path.basename(filename)}")
+                    send_nachricht("Neues Foto verfügbar!")
+                except Exception:
+                    log.exception("Fehler bei Foto oder Upload")
+            else:
+                log.info("Kein Foto – außerhalb der Tageslichtstunden.")
     else:
         log.info("Außerhalb der Sendezeit (06–23 Uhr) – kein Versand.")
 
