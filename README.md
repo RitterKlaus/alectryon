@@ -88,6 +88,7 @@ Wir probieren das mal. Eventuell schalten wir das WLAN abends ab und morgens wie
 Der Befehl braucht leider sudo
 
 
+pip install astral==3.2 --break-system-packages
 
 ## Zurückgestellte Funktionen
 

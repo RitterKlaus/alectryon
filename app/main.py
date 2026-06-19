@@ -76,6 +76,7 @@ def main():
                     log.exception("Fehler bei Foto oder Upload")
             else:
                 log.info("Kein Foto – außerhalb der Tageslichtstunden.")
+                send_nachricht("Kein Foto – außerhalb der Tageslichtstunden.")
     else:
         log.info("Außerhalb der Sendezeit (06–23 Uhr) – kein Versand.")
 
