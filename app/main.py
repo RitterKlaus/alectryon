@@ -75,10 +75,18 @@ def main():
     else:
         log.info("Außerhalb der Sendezeit (06–23 Uhr) – kein Versand.")
 
-    if usv is not None and usv["ladestand_pz"] < 20:
+    if usv is not None and usv["ladestand_pz"] < 13:
         log.warning(f"Ladestand kritisch ({usv['ladestand_pz']} %) – fahre herunter.")
         try:
             send_nachricht(f"Ladestand kritisch: {usv['ladestand_pz']} % – Raspberry fährt herunter.")
+        except Exception:
+            log.exception("Fehler beim Senden der Nachricht")
+        subprocess.run(["sudo", "shutdown", "-h", "now"])
+
+    if temp > 75:
+        log.warning(f"CPU-Temperatur kritisch ({temp:.1f} °C) – fahre herunter.")
+        try:
+            send_nachricht(f"CPU-Temperatur kritisch: {temp:.1f} °C – Raspberry fährt herunter.")
         except Exception:
             log.exception("Fehler beim Senden der Nachricht")
         subprocess.run(["sudo", "shutdown", "-h", "now"])
