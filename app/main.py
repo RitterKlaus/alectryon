@@ -4,6 +4,8 @@ import logging
 import os
 import subprocess
 
+import ftplib
+
 from app.camera import take_photo, upload_photo
 from app.sensor_internal import VcgencmdSensor
 from app.sensor_sunlight import SunlightSensor
@@ -69,11 +71,23 @@ def main():
                 try:
                     filename = take_photo()
                     log.info(f"Foto gespeichert: {filename}")
-                    upload_photo(filename)
-                    log.info(f"Foto hochgeladen: {os.path.basename(filename)}")
-                    send_nachricht("Neues Foto verfügbar!")
                 except Exception:
-                    log.exception("Fehler bei Foto oder Upload")
+                    log.exception("Fehler beim Fotografieren")
+                    filename = None
+
+                if filename:
+                    try:
+                        upload_photo(filename)
+                        log.info(f"Foto hochgeladen: {os.path.basename(filename)}")
+                        send_nachricht("Neues Foto verfügbar!")
+                    except ftplib.error_perm as e:
+                        if "552" in str(e):
+                            log.error(f"FTP-Quota überschritten: {e}")
+                            send_nachricht("Foto-Upload gescheitert - Speicher auf der Website ist voll!")
+                        else:
+                            log.exception("FTP-Fehler beim Upload")
+                    except Exception:
+                        log.exception("Fehler beim Upload")
             else:
                 log.info("Kein Foto – außerhalb der Tageslichtstunden.")
                 send_nachricht("Kein Foto – außerhalb der Tageslichtstunden.")
